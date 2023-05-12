@@ -23,15 +23,15 @@ func CreateCategoryController(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, helpers.ResponseNotData{
 		Status:  "Proses Create Berhasil",
-		Message: "Successfuly Registrasi Admin",
+		Message: "Successfuly Create Category",
 	})
 
 }
 
 func GetCategoryControllerAll(c echo.Context) error {
-	var category []models.Category
+	var categoriAll []models.Category
 
-	if err := configs.DB.Find(&category).Error; err != nil {
+	if err := configs.DB.Find(&categoriAll).Error; err != nil {
 		return c.JSON(http.StatusBadRequest, helpers.ResponseNotData{
 			Status:  "Error",
 			Message: "Data Tidak Tersedia",
@@ -39,7 +39,27 @@ func GetCategoryControllerAll(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, helpers.ResponseData{
-		Status:  "Success Get Category",
+		Status:  "Success Get Category All",
+		Message: "Successfuly",
+		Data:    categoriAll,
+	})
+}
+
+func GetCategoryController(c echo.Context) error {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{
+			"message": "Invalid Id",
+		})
+	}
+
+	var category models.Category
+	if err = configs.DB.Where("id = ?", id).First(&category).Error; err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, helpers.ResponseData{
+		Status:  "Success Get Category by ID",
 		Message: "Successfuly",
 		Data:    category,
 	})
@@ -66,9 +86,10 @@ func UpdateCategoryController(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
-	return c.JSON(http.StatusOK, helpers.ResponseNotData{
-		Status:  "Success Upload Data Category",
+	return c.JSON(http.StatusOK, helpers.ResponseData{
+		Status:  "Success Update Category",
 		Message: "Successfuly",
+		Data:    category,
 	})
 
 }
@@ -92,7 +113,7 @@ func DeleteCategoryController(c echo.Context) error {
 
 	if err := configs.DB.Delete(&category).Error; err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{
-			"message": "Gagal Delete Category Data",
+			"message": "Gagal Delete Data Category",
 			"error":   err.Error(),
 		})
 	}
