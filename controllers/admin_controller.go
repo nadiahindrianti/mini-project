@@ -24,7 +24,7 @@ func RegisterAdminController(c echo.Context) error {
 		})
 	}
 
-	return c.JSON(http.StatusOK, helpers.ResponseNotData{
+	return c.JSON(http.StatusOK, helpers.ResponseData{
 		Status:  "Proses Registrasi Berhasil",
 		Message: "Successfuly Registrasi Admin",
 	})
@@ -56,72 +56,56 @@ func LoginAdminController(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, helpers.ResponseData{
 		Status:  "Proses Login Berhasil",
-		Message: "Successfuly Login User",
+		Message: "Successfuly Login Admin",
 		Data:    adminResponse,
 	})
 }
 
 func GetAdminControllerAll(c echo.Context) error {
-	var users []models.UserResponseStand
+	var adminAll []models.Admin
 
-	if err := configs.DB.Find(&users).Error; err != nil {
-		return c.JSON(http.StatusBadRequest, helpers.ResponseNotData{
-			Status:  "Error",
-			Message: "Data Tidak Tersedia",
-		})
+	if err := configs.DB.Find(&adminAll).Error; err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
-
 	return c.JSON(http.StatusOK, helpers.ResponseData{
-		Status:  "Success Get AdminProfile",
+		Status:  "Success Get Admin Data All",
 		Message: "Successfuly",
-		Data:    users,
+		Data:    adminAll,
 	})
 }
 
-func GetAdminProfile(c echo.Context) error {
+func GetAdminById(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, helpers.ResponseNotData{
-			Status:  "Error",
-			Message: "Data Tidak Tersedia",
+		return c.JSON(http.StatusInternalServerError, map[string]string{
+			"message": "Invalid Id",
 		})
 	}
 
 	var admin models.Admin
 	if err = configs.DB.Where("id = ?", id).First(&admin).Error; err != nil {
-		return c.JSON(http.StatusBadRequest, helpers.ResponseNotData{
-			Status:  "Error",
-			Message: "Data Tidak Tersedia",
-		})
-	}
-
-	adminResp := models.AdminResponseStand{
-		Name:    admin.Name,
-		Email:   admin.Email,
-		Contact: admin.Contact,
-		Role:    admin.Role,
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
 	return c.JSON(http.StatusOK, helpers.ResponseData{
 		Status:  "Success Get AdminProfile",
 		Message: "Successfuly",
-		Data:    adminResp,
+		Data:    admin,
 	})
 }
 
 func UpdateAdminController(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, helpers.ResponseNotData{
-			Status:  "Error",
-			Message: "Data Tidak Tersedia",
+		return c.JSON(http.StatusInternalServerError, map[string]string{
+			"message": "Invalid Id",
 		})
 	}
+
 	var admin models.Admin
 	if err := configs.DB.Where("id = ?", id).First(&admin).Error; err != nil {
-		return c.JSON(http.StatusBadRequest, helpers.ResponseNotData{
-			Status:  "Error",
-			Message: "Data Tidak Tersedia",
+		return echo.NewHTTPError(http.StatusNotFound, map[string]string{
+			"message": "admin not found",
 		})
 	}
 
@@ -130,96 +114,70 @@ func UpdateAdminController(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
-	adminResp := models.AdminResponseStand{
-		Name:    admin.Name,
-		Email:   admin.Email,
-		Contact: admin.Contact,
-		Role:    admin.Role,
-	}
-
 	return c.JSON(http.StatusOK, helpers.ResponseData{
 		Status:  "Success Upload Admin Data",
 		Message: "Successfuly",
-		Data:    adminResp,
+		Data:    admin,
 	})
-
 }
 
 func DeleteAdminController(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, helpers.ResponseNotData{
-			Status:  "Error",
-			Message: "Data Tidak Tersedia",
+		return c.JSON(http.StatusInternalServerError, map[string]string{
+			"message": "Invalid Id",
 		})
 	}
 
 	var admin models.Admin
-	if err := configs.DB.First(&admin, "id = ? ", id).Error; err != nil {
-		return c.JSON(http.StatusBadRequest, helpers.ResponseNotData{
-			Status:  "Error",
-			Message: "Data Tidak Tersedia",
+	if err := configs.DB.First("id = ?", id).First(&admin).Error; err != nil {
+		return echo.NewHTTPError(http.StatusNotFound, map[string]string{
+			"message": "admin not found",
 		})
 	}
 
 	if err := configs.DB.Delete(&admin).Error; err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{
-			"message": "Gagal Delete User Data",
-			"error":   err.Error(),
+		return c.JSON(http.StatusBadRequest, helpers.ResponseNotData{
+			Status:  "Failed to Delete Admin Data",
+			Message: "err.Error()",
 		})
 	}
 
 	return c.JSON(http.StatusBadRequest, helpers.ResponseNotData{
-		Status:  "Succes Delete User Data",
+		Status:  "Succes Delete Admin Data",
 		Message: "Succesfuly",
 	})
 }
 
 func GetUsersControllerAll(c echo.Context) error {
-	var users []models.UserResponseStand
+	var userAll []models.User
 
-	if err := configs.DB.Find(&users).Error; err != nil {
-		return c.JSON(http.StatusBadRequest, helpers.ResponseNotData{
-			Status:  "Error",
-			Message: "Data Tidak Tersedia",
-		})
+	if err := configs.DB.Find(&userAll).Error; err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
-
 	return c.JSON(http.StatusOK, helpers.ResponseData{
-		Status:  "Success Get AdminProfile",
+		Status:  "Success Get Admin Data All",
 		Message: "Successfuly",
-		Data:    users,
+		Data:    userAll,
 	})
 }
 
 func GetUsersId(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, helpers.ResponseNotData{
-			Status:  "Error",
-			Message: "Data Tidak Tersedia",
+		return c.JSON(http.StatusInternalServerError, map[string]string{
+			"message": "Invalid Id",
 		})
 	}
 
 	var user models.User
 	if err = configs.DB.Where("id = ?", id).First(&user).Error; err != nil {
-		return c.JSON(http.StatusBadRequest, helpers.ResponseNotData{
-			Status:  "Error",
-			Message: "Data Tidak Tersedia",
-		})
-	}
-
-	userResp := models.UserResponseStand{
-		Name:    user.Name,
-		Email:   user.Email,
-		Contact: user.Contact,
-		Alamat:  user.Email,
-		Role:    user.Role,
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
 	return c.JSON(http.StatusOK, helpers.ResponseData{
-		Status:  "Success Get UserProfile",
+		Status:  "Success Get User by ID",
 		Message: "Successfuly",
-		Data:    userResp,
+		Data:    user,
 	})
 }
