@@ -58,4 +58,5 @@ func InitialMigration() {
 	DB.AutoMigrate(&models.Admin{})
 	DB.AutoMigrate(&models.Product{})
 	DB.AutoMigrate(&models.Category{})
+	DB.AutoMigrate(&models.Order{})
 }
