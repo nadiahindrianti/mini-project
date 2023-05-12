@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"Mini_Project_Toko-Online/helpers"
 	database "Mini_Project_Toko-Online/lib/database"
 	"Mini_Project_Toko-Online/models"
 	"net/http"
@@ -19,7 +20,7 @@ func CreateOrderController(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusCreated, map[string]interface{}{
-		"message": "success create new booking",
+		"message": "Success Create Order",
 		"order":   result,
 	})
 
@@ -37,20 +38,21 @@ func DeleteOrderController(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
-		"messages": "success delete product",
+		"messages": "Success Delete Order",
 		"id":       result,
 	})
 }
 
-func GetOrdersController(c echo.Context) error {
-	bookings, err := database.GetOrders()
+func GetOrdersControllerAll(c echo.Context) error {
+	order, err := database.GetOrders()
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
-	return c.JSON(http.StatusOK, map[string]interface{}{
-		"messages": "success get all",
-		"bookings": bookings,
+	return c.JSON(http.StatusOK, helpers.ResponseData{
+		Status:  "Success Get Order Data All",
+		Message: "Successfuly",
+		Data:    order,
 	})
 }
 
@@ -65,8 +67,9 @@ func GetOrderController(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
-	return c.JSON(http.StatusOK, map[string]interface{}{
-		"messages": "success get by id",
-		"orders":   order,
+	return c.JSON(http.StatusOK, helpers.ResponseData{
+		Status:  "Success Get Order Data Id",
+		Message: "Successfuly",
+		Data:    order,
 	})
 }

@@ -24,7 +24,7 @@ func CreateProductController(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, helpers.ResponseNotData{
 		Status:  "Proses Create Berhasil",
-		Message: "Successfuly Registrasi Admin",
+		Message: "Successfuly Create Product",
 	})
 
 }
@@ -36,24 +36,24 @@ func GetProductControllerAll(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
-		"messages": "success get all products",
+		"messages": "Success Get All Products",
 		"products": products,
 	})
 }
 
-func GetProductsController(c echo.Context) error {
+func GetProductController(c echo.Context) error {
 	Category, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
-	product, err := database.GetProduct(Category)
+	product, err := database.GetProductController(Category)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
-		"messages": "success get product",
+		"messages": "Success Get Product",
 		"products": product,
 	})
 }
@@ -105,7 +105,7 @@ func DeleteProductController(c echo.Context) error {
 
 	if err := configs.DB.Delete(&product).Error; err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{
-			"message": "Gagal Delete User Data",
+			"message": "Gagal Delete Product Data",
 			"error":   err.Error(),
 		})
 	}
