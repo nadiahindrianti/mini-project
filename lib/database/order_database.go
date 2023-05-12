@@ -25,12 +25,12 @@ func DeleteOrder(orderID int) (interface{}, error) {
 }
 
 func GetOrders() (interface{}, error) {
-	var orders []models.Order
+	var order []models.Order
 
-	if err := configs.DB.Joins("Product").Joins("User").Find(&orders).Error; err != nil {
+	if err := configs.DB.Joins("Product").Joins("User").Find(&order).Error; err != nil {
 		return nil, err
 	}
-	return orders, nil
+	return order, nil
 }
 
 func GetOrderController(OrderID uint) (interface{}, error) {

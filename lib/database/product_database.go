@@ -36,28 +36,26 @@ func UpdateProductController(productID uint, p models.Product) (interface{}, err
 }
 
 func GetProducts() (interface{}, error) {
-	var products []models.Product
-
-	if err := configs.DB.Joins("Category").Find(&products).Error; err != nil {
-		return nil, err
-	}
-	return products, nil
-}
-
-func GetProduct(Category int) (interface{}, error) {
 	var product []models.Product
-	Category = int(Category)
 
-	if err := configs.DB.Where("category_id = ?", Category).Preload("Category").Find(&product).Error; err != nil {
+	if err := configs.DB.Joins("Category").Find(&product).Error; err != nil {
 		return nil, err
 	}
-
 	return product, nil
 }
 
+func GetProductController(Category int) (interface{}, error) {
+	var productAll []models.Product
+	if err := configs.DB.Find(&productAll).Error; err != nil {
+		return nil, err
+	}
+
+	return productAll, nil
+}
+
 func DeleteProductController(productID int) (interface{}, error) {
-	var admin models.Admin
-	if err := configs.DB.Delete(&admin, productID).Error; err != nil {
+	err := configs.DB.Delete(&models.Product{}, productID).Error
+	if err != nil {
 		return nil, err
 	}
 	return productID, nil

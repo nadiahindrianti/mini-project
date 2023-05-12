@@ -25,26 +25,20 @@ func RegisterUser(user models.User) (interface{}, error) {
 	return user, nil
 }
 
-func UpdateUser(UserID uint, u models.User) (interface{}, error) {
-	user := models.User{}
-	user.ID = UserID
-	configs.DB.First(&user)
+func UpdateUserController(user models.User) (interface{}, error) {
+	var userUpdate models.User
+	configs.DB.First(&userUpdate, user.ID)
 
-	user.Name = u.Name
-	user.Email = u.Email
-	user.Contact = u.Contact
-	user.Role = u.Role
-	user.Password = u.Password
-
-	err := configs.DB.Save(&user).Error
-	if err != nil {
-		return nil, err
+	if e := configs.DB.Model(&userUpdate).Updates(models.User{Name: user.Name, Email: user.Email, Contact: user.Contact, Alamat: user.Alamat, Role: user.Role, Password: user.Password}).Error; e != nil {
+		return nil, e
 	}
-	return user, nil
+	return userUpdate, nil
+
 }
 
-func GetUser(userid int) (interface{}, error) {
-	var user []models.User
+func GetUserProfile(userID uint) (interface{}, error) {
+	var user models.User
+	user.ID = userID
 
 	if err := configs.DB.First(&user).Error; err != nil {
 		return nil, err
@@ -53,11 +47,11 @@ func GetUser(userid int) (interface{}, error) {
 	return user, nil
 }
 
-func DeleteUser(id any) (interface{}, error) {
-	var user models.User
-	if err := configs.DB.Delete(&user).Error; err != nil {
+func DeleteUser(userID int) (interface{}, error) {
+	err := configs.DB.Delete(&models.User{}, userID).Error
+	if err != nil {
 		return nil, err
 	}
 
-	return user, nil
+	return userID, nil
 }

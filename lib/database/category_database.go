@@ -10,9 +10,6 @@ func CreateCategoryController(category models.Category) (interface{}, error) {
 		return nil, err
 	}
 
-	if err := configs.DB.Joins("Category").Find(&category).Error; err != nil {
-		return nil, err
-	}
 	return category, nil
 }
 
@@ -32,18 +29,25 @@ func UpdateCategoryController(CategoryID uint, categoryupdate models.Category) (
 	return category, nil
 }
 
-func GetCategoryControllerAll() (interface{}, error) {
-	var categories []models.Category
+func DeleteCategoryController(CategoryID int) (interface{}, error) {
+	if err := configs.DB.Delete(&models.Category{}, CategoryID).Error; err != nil {
+		return nil, err
+	}
+	return CategoryID, nil
+}
 
-	if err := configs.DB.First(&categories).Error; err != nil {
+func GetCategoryControllerAll() (interface{}, error) {
+	var category []models.Category
+
+	if err := configs.DB.Find(&category).Error; err != nil {
 		return nil, err
 	}
 
-	return categories, nil
+	return category, nil
 }
 
 func GetCategoryController(adminid int) (interface{}, error) {
-	var category []models.Category
+	var category models.Category
 
 	if err := configs.DB.First(&category).Error; err != nil {
 		return nil, err

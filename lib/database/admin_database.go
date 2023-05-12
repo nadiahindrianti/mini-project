@@ -16,24 +16,26 @@ func RegisterAdmin(admin models.Admin) (interface{}, error) {
 }
 
 func LoginAdmin(admin models.Admin) (interface{}, error) {
-	if err := configs.DB.Where("email = ? AND password = ?", admin.Email, admin.Password).First(&admin).Error; err != nil {
+	var err error
+
+	if err = configs.DB.Where("email = ? AND password = ?", admin.Email, admin.Password).First(&admin).Error; err != nil {
 		return nil, err
 	}
-
 	return admin, nil
 }
 
-func GetAdminsControllerAll() (interface{}, error) {
-	var admins []models.Admin
+func GetAdminControllerAll() (interface{}, error) {
+	var adminAll []models.Admin
 
-	if err := configs.DB.Find(&admins).Error; err != nil {
+	if err := configs.DB.Find(&adminAll).Error; err != nil {
 		return nil, err
 	}
-	return admins, nil
+	return adminAll, nil
 }
 
-func GetAdminProfile(adminid int) (interface{}, error) {
-	var admin []models.Admin
+func GetAdminProfile(adminID uint) (interface{}, error) {
+	var admin models.Admin
+	admin.ID = adminID
 
 	if err := configs.DB.First(&admin).Error; err != nil {
 		return nil, err
@@ -42,48 +44,45 @@ func GetAdminProfile(adminid int) (interface{}, error) {
 	return admin, nil
 }
 
-func UpdateAdminController(adminID uint, a models.Admin) (interface{}, error) {
-	admin := models.Admin{}
-	admin.ID = adminID
-	configs.DB.First(&admin)
+func UpdateAdminController(admin models.Admin) (interface{}, error) {
+	var adminUpdate models.Admin
+	configs.DB.First(&adminUpdate, admin.ID)
 
-	admin.Name = a.Name
-	admin.Email = a.Email
-	admin.Contact = a.Contact
-	admin.Role = a.Role
-	admin.Password = a.Password
+	if e := configs.DB.Model(&adminUpdate).Updates(models.Admin{Name: admin.Name, Email: admin.Email, Role: admin.Role, Password: admin.Password}).Error; e != nil {
+		return nil, e
+	}
+	return adminUpdate, nil
 
-	err := configs.DB.Save(&admin).Error
+}
+
+func DeleteAdminController(adminID int) (interface{}, error) {
+	err := configs.DB.Delete(&models.Admin{}, adminID).Error
 	if err != nil {
 		return nil, err
 	}
-	return admin, nil
-}
 
-func DeleteAdminController(id any) (interface{}, error) {
-	var admin models.Admin
-	if err := configs.DB.Delete(&admin).Error; err != nil {
-		return nil, err
-	}
+	return adminID, nil
 
-	return admin, nil
 }
 
 func GetUsersControllerAll() (interface{}, error) {
-	var users []models.User
+	var userAll []models.User
 
-	if err := configs.DB.Find(&users).Error; err != nil {
+	err := configs.DB.Find(&userAll).Error
+	if err != nil {
 		return nil, err
 	}
-	return users, nil
+
+	return userAll, nil
 }
 
-func GetUsersId(userid int) (interface{}, error) {
-	var user []models.User
+func GetUsersId(userID uint) (interface{}, error) {
+	var user models.User
+	user.ID = userID
 
 	if err := configs.DB.First(&user).Error; err != nil {
 		return nil, err
 	}
 
-	return user, nil
+	return userID, nil
 }
